@@ -1,0 +1,192 @@
+{
+  "id": "emperor-clothes",
+  "book": "벌거벗은 임금님",
+  "sourceEdition": {
+    "name": "Project Gutenberg · #1597",
+    "url": "https://www.gutenberg.org/ebooks/1597",
+    "credits": "Project Gutenberg #1597. Produced by Dianne Bean and David Widger. Source updated 2026-07-14. 이 판의 서지정보에 영어 번역자 표기는 없음.",
+    "catalogEdition": "public-edition-2026-10-31",
+    "sourceFile": "/Users/encks/Documents/Codex/2026-10-30/new-chat/outputs/ilsaeng-iljang/content/emperor-clothes-en.txt",
+    "snapshot": "sources/emperor-clothes-en.txt",
+    "scope": "지정된 원문 파일의 표제, 목차, 제사, 주석, 본문 전체"
+  },
+  "sourceSHA256": "cb760fd565707b3bdea306bb3d7922ba1e913473e174d10626d5dbbf5860fdad",
+  "sourceLanguage": "en",
+  "complete": true,
+  "reviewStatus": "ai_source_comparison_complete_professional_review_pending",
+  "paragraphs": [
+    {
+      "source": "THE EMPEROR'S NEW CLOTHES",
+      "ko": "황제의 새 옷"
+    },
+    {
+      "source": "Many years ago, there was an Emperor, who was so excessively fond of\nnew clothes, that he spent all his money in dress. He did not trouble\nhimself in the least about his soldiers; nor did he care to go either to\nthe theatre or the chase, except for the opportunities then afforded him\nfor displaying his new clothes. He had a different suit for each hour of\nthe day; and as of any other king or emperor, one is accustomed to say,\n“he is sitting in council,” it was always said of him, “The Emperor is\nsitting in his wardrobe.”",
+      "ko": "아주 오래전에, 새 옷을 어찌나 좋아하는지 돈을 전부 옷차림에 써 버리는 황제가 있었다. 황제는 병사들에 대해서는 조금도 신경 쓰지 않았다. 극장에 가거나 사냥을 나가는 것도, 새 옷을 자랑할 기회가 생기는 경우가 아니면 관심이 없었다. 황제에게는 하루의 매시간마다 갈아입을 다른 옷이 있었다. 다른 왕이나 황제에 대해서는 흔히 “회의를 하고 계신다”라고 말하지만, 그에 대해서는 언제나 “황제께서는 옷방에 앉아 계신다”라고들 했다."
+    },
+    {
+      "source": "Time passed merrily in the large town which was his capital; strangers\narrived every day at the court. One day, two rogues, calling themselves\nweavers, made their appearance. They gave out that they knew how to\nweave stuffs of the most beautiful colors and elaborate patterns, the\nclothes manufactured from which should have the wonderful property of\nremaining invisible to everyone who was unfit for the office he held, or\nwho was extraordinarily simple in character.",
+      "ko": "수도인 큰 도시에서는 시간이 즐겁게 흘렀고, 궁정에는 날마다 낯선 사람들이 찾아왔다. 어느 날, 자신들을 베 짜는 사람이라고 부르는 사기꾼 둘이 나타났다. 그들은 가장 아름다운 빛깔과 정교한 무늬를 지닌 천을 짤 줄 안다고 소문을 냈다. 그 천으로 만든 옷에는 놀라운 성질이 있어서, 자기가 맡은 직책에 어울리지 않거나 유난히 어리석은 사람의 눈에는 보이지 않는다는 것이었다."
+    },
+    {
+      "source": "“These must, indeed, be splendid clothes!” thought the Emperor. “Had I\nsuch a suit, I might at once find out what men in my realms are unfit\nfor their office, and also be able to distinguish the wise from the\nfoolish! This stuff must be woven for me immediately.” And he caused\nlarge sums of money to be given to both the weavers in order that they\nmight begin their work directly.",
+      "ko": "‘그거야말로 참으로 훌륭한 옷이겠구나!’ 황제는 생각했다. ‘그런 옷이 있으면 내 나라에서 누가 제 직책에 어울리지 않는지 즉시 알아낼 수 있고, 지혜로운 사람과 어리석은 사람도 구별할 수 있을 테지! 당장 나를 위해 그 천을 짜게 해야겠다.’ 황제는 두 직공에게 큰돈을 주어 곧바로 일을 시작하게 했다."
+    },
+    {
+      "source": "So the two pretended weavers set up two looms, and affected to work very\nbusily, though in reality they did nothing at all. They asked for the\nmost delicate silk and the purest gold thread; put both into their own\nknapsacks; and then continued their pretended work at the empty looms\nuntil late at night.",
+      "ko": "그리하여 가짜 직공 둘은 베틀 두 대를 차려 놓고, 아주 바쁘게 일하는 척했다. 실제로는 아무것도 하지 않으면서 말이다. 그들은 가장 고운 비단실과 가장 순도 높은 금실을 달라고 해서, 둘 다 자기들의 배낭에 집어넣었다. 그러고는 텅 빈 베틀 앞에서 밤늦게까지 계속 일하는 척했다."
+    },
+    {
+      "source": "“I should like to know how the weavers are getting on with my cloth,”\n said the Emperor to himself, after some little time had elapsed; he was,\nhowever, rather embarrassed, when he remembered that a simpleton, or\none unfit for his office, would be unable to see the manufacture. To be\nsure, he thought he had nothing to risk in his own person; but yet, he\nwould prefer sending somebody else, to bring him intelligence about the\nweavers, and their work, before he troubled himself in the affair. All\nthe people throughout the city had heard of the wonderful property the\ncloth was to possess; and all were anxious to learn how wise, or how\nignorant, their neighbors might prove to be.",
+      "ko": "‘직공들이 내 천을 얼마나 짰는지 알고 싶구나.’ 얼마쯤 시간이 지나자 황제는 혼자 말했다. 하지만 바보나 제 직책에 어울리지 않는 사람은 그 천을 볼 수 없다는 생각이 나자, 조금 마음이 불편했다. 물론 황제는 자신에게는 걱정할 것이 없다고 생각했다. 그래도 직접 그 일에 나서기 전에 다른 사람을 보내, 직공들과 그들의 작업에 관한 소식을 들여오는 편이 더 좋겠다고 여겼다. 도시의 모든 사람은 그 천이 지녔다는 놀라운 성질에 대해 들어 알고 있었고, 모두 자기 이웃이 얼마나 지혜로운지, 혹은 얼마나 무지한 사람으로 드러날지 몹시 알고 싶어 했다."
+    },
+    {
+      "source": "“I will send my faithful old minister to the weavers,” said the Emperor\nat last, after some deliberation, “he will be best able to see how the\ncloth looks; for he is a man of sense, and no one can be more suitable\nfor his office than he is.”",
+      "ko": "“충직한 늙은 대신을 직공들에게 보내야겠다.” 얼마 동안 생각한 끝에 황제가 마침내 말했다. “그 사람이 천이 어떻게 생겼는지 가장 잘 볼 수 있을 것이다. 분별 있는 사람인데다, 자기 직책에 그보다 더 잘 어울리는 사람은 없으니까.”"
+    },
+    {
+      "source": "So the faithful old minister went into the hall, where the knaves were\nworking with all their might, at their empty looms. “What can be the\nmeaning of this?” thought the old man, opening his eyes very wide. “I\ncannot discover the least bit of thread on the looms.” However, he did\nnot express his thoughts aloud.",
+      "ko": "그래서 충직한 늙은 대신은 사기꾼들이 빈 베틀 앞에서 온 힘을 다해 일하고 있는 큰 방으로 들어갔다. ‘이게 대체 무슨 일인가?’ 노인은 눈을 크게 뜨며 생각했다. ‘베틀에 실 한 오라기도 보이지 않잖아.’ 하지만 그 생각을 입 밖에 내지는 않았다."
+    },
+    {
+      "source": "The impostors requested him very courteously to be so good as to come\nnearer their looms; and then asked him whether the design pleased\nhim, and whether the colors were not very beautiful; at the same time\npointing to the empty frames. The poor old minister looked and looked,\nhe could not discover anything on the looms, for a very good reason,\nviz: there was nothing there. “What!” thought he again. “Is it possible\nthat I am a simpleton? I have never thought so myself; and no one must\nknow it now if I am so. Can it be, that I am unfit for my office? No,\nthat must not be said either. I will never confess that I could not see\nthe stuff.”",
+      "ko": "사기꾼들은 아주 공손하게 대신에게 베틀 가까이 와 달라고 청했다. 그러고는 빈 틀을 가리키며, 무늬가 마음에 드는지, 색깔들이 참으로 아름답지 않은지 물었다. 가엾은 늙은 대신은 보고 또 보았지만, 베틀 위에서 아무것도 찾아낼 수 없었다. 그럴 만한 분명한 이유가 있었으니, 거기에는 아무것도 없었기 때문이다. ‘아니!’ 그는 다시 생각했다. ‘내가 바보란 말인가? 나 자신은 한 번도 그렇게 생각한 적이 없는데. 내가 그렇다 해도 이제 누구도 알아서는 안 된다. 혹시 내가 내 직책에 어울리지 않는 것인가? 아니, 그런 말도 나와서는 안 되지. 이 천이 보이지 않았다고는 절대로 털어놓지 않겠다.’"
+    },
+    {
+      "source": "“Well, Sir Minister!” said one of the knaves, still pretending to work.\n“You do not say whether the stuff pleases you.”",
+      "ko": "“그런데 대신 나리!” 사기꾼 하나가 여전히 일하는 척하며 말했다. “천이 마음에 드시는지 말씀을 안 하시는군요.”"
+    },
+    {
+      "source": "“Oh, it is excellent!” replied the old minister, looking at the loom\nthrough his spectacles. “This pattern, and the colors, yes, I will tell\nthe Emperor without delay, how very beautiful I think them.”",
+      "ko": "“아, 아주 훌륭하네!” 늙은 대신이 안경 너머로 베틀을 들여다보며 대답했다. “이 무늬하며, 이 색깔들하며, 그래, 내가 얼마나 아름답다고 생각하는지 지체 없이 황제 폐하께 말씀드리겠네.”"
+    },
+    {
+      "source": "“We shall be much obliged to you,” said the impostors, and then they\nnamed the different colors and described the pattern of the pretended\nstuff. The old minister listened attentively to their words, in order\nthat he might repeat them to the Emperor; and then the knaves asked for\nmore silk and gold, saying that it was necessary to complete what\nthey had begun. However, they put all that was given them into their\nknapsacks; and continued to work with as much apparent diligence as\nbefore at their empty looms.",
+      "ko": "“정말 감사하겠습니다.” 사기꾼들은 이렇게 말하고, 있지도 않은 천의 갖가지 색깔을 하나하나 부르며 무늬를 설명했다. 늙은 대신은 황제에게 그대로 전하려고 그 말을 주의 깊게 들었다. 그러자 사기꾼들은 시작한 일을 마치려면 더 필요하다며, 비단실과 금실을 더 달라고 했다. 하지만 받은 것은 모두 자기들의 배낭에 집어넣고, 빈 베틀 앞에서 전과 마찬가지로 부지런해 보이게 계속 일했다."
+    },
+    {
+      "source": "The Emperor now sent another officer of his court to see how the men\nwere getting on, and to ascertain whether the cloth would soon be\nready. It was just the same with this gentleman as with the minister;\nhe surveyed the looms on all sides, but could see nothing at all but the\nempty frames.",
+      "ko": "이번에는 황제가 궁정의 다른 관리를 보내, 그들의 일이 얼마나 진척되었는지, 천이 곧 완성될지 알아보게 했다. 이 신사에게도 대신과 똑같은 일이 벌어졌다. 그는 베틀을 사방에서 살펴보았지만, 텅 빈 틀 말고는 아무것도 볼 수 없었다."
+    },
+    {
+      "source": "“Does not the stuff appear as beautiful to you, as it did to my lord the\nminister?” asked the impostors of the Emperor's second ambassador; at\nthe same time making the same gestures as before, and talking of the\ndesign and colors which were not there.",
+      "ko": "“대신 나리께서 보셨을 때처럼, 나리께도 천이 아름다워 보이지 않습니까?” 사기꾼들은 황제가 보낸 두 번째 사절에게 이렇게 물으며, 전과 똑같은 손짓을 하고는, 있지도 않은 무늬와 색깔에 대해 떠들었다."
+    },
+    {
+      "source": "“I certainly am not stupid!” thought the messenger. “It must be, that I\nam not fit for my good, profitable office! That is very odd; however, no\none shall know anything about it.” And accordingly he praised the stuff\nhe could not see, and declared that he was delighted with both colors\nand patterns. “Indeed, please your Imperial Majesty,” said he to his\nsovereign when he returned, “the cloth which the weavers are preparing\nis extraordinarily magnificent.”",
+      "ko": "‘나는 절대로 멍청하지 않아!’ 사절은 생각했다. ‘그렇다면 내가 이 좋고 수입도 많은 직책에 어울리지 않는 게 분명하군! 참 이상한 일이야. 하지만 아무도 이 일을 알아서는 안 되지.’ 그래서 그는 보이지도 않는 천을 칭찬하고, 색깔과 무늬가 모두 마음에 쏙 든다고 말했다. “참으로 그러하옵니다, 황제 폐하.” 돌아와서는 군주에게 이렇게 말했다. “직공들이 만들고 있는 천은 더없이 장엄하고 훌륭하옵니다.”"
+    },
+    {
+      "source": "The whole city was talking of the splendid cloth which the Emperor had\nordered to be woven at his own expense.",
+      "ko": "온 도시가 황제의 돈으로 짜게 했다는 그 훌륭한 천 이야기로 떠들썩했다."
+    },
+    {
+      "source": "And now the Emperor himself wished to see the costly manufacture, while\nit was still in the loom. Accompanied by a select number of officers of\nthe court, among whom were the two honest men who had already admired\nthe cloth, he went to the crafty impostors, who, as soon as they were\naware of the Emperor's approach, went on working more diligently than\never; although they still did not pass a single thread through the\nlooms.",
+      "ko": "이제 황제 자신도 그 값비싼 직물이 아직 베틀에 걸려 있을 때 보고 싶어졌다. 황제는 엄선한 궁정 관리 몇 사람을 거느리고 교활한 사기꾼들을 찾아갔다. 그중에는 이미 천에 감탄했던 두 정직한 사람도 끼어 있었다. 사기꾼들은 황제가 다가오는 것을 알아차리자, 그 어느 때보다 더 부지런히 일을 계속했다. 여전히 베틀에 실 한 가닥도 꿰지 않으면서도 말이다."
+    },
+    {
+      "source": "“Is not the work absolutely magnificent?” said the two officers of the\ncrown, already mentioned. “If your Majesty will only be pleased to look\nat it! What a splendid design! What glorious colors!” and at the same\ntime they pointed to the empty frames; for they imagined that everyone\nelse could see this exquisite piece of workmanship.",
+      "ko": "“참으로 더없이 훌륭한 솜씨가 아니옵니까?” 앞서 말한 두 관리가 말했다. “폐하께서 보아 주시기만 하시면 됩니다! 얼마나 훌륭한 무늬입니까! 얼마나 찬란한 색깔입니까!” 그들은 그렇게 말하며 텅 빈 틀을 가리켰다. 자기들 말고 다른 사람은 모두 이 정교한 작품을 볼 수 있을 것이라고 생각했기 때문이다."
+    },
+    {
+      "source": "“How is this?” said the Emperor to himself. “I can see nothing! This\nis indeed a terrible affair! Am I a simpleton, or am I unfit to be an\nEmperor? That would be the worst thing that could happen--Oh! the cloth\nis charming,” said he, aloud. “It has my complete approbation.” And he\nsmiled most graciously, and looked closely at the empty looms; for on no\naccount would he say that he could not see what two of the officers of\nhis court had praised so much. All his retinue now strained their eyes,\nhoping to discover something on the looms, but they could see no more\nthan the others; nevertheless, they all exclaimed, “Oh, how beautiful!”\n and advised his majesty to have some new clothes made from this splendid\nmaterial, for the approaching procession. “Magnificent! Charming!\nExcellent!” resounded on all sides; and everyone was uncommonly gay. The\nEmperor shared in the general satisfaction; and presented the impostors\nwith the riband of an order of knighthood, to be worn in their\nbutton-holes, and the title of “Gentlemen Weavers.”",
+      "ko": "‘이게 어찌 된 일인가?’ 황제는 혼자 말했다. ‘아무것도 보이지 않아! 이거야말로 무서운 일이로구나! 내가 바보인가, 아니면 황제 노릇을 하기에 어울리지 않는 사람인가? 그건 일어날 수 있는 일 가운데 최악일 텐데―아! 천이 참으로 아름답구나.’ 마지막 말은 소리 내어 했다. “아주 마음에 든다.” 황제는 더없이 인자하게 웃으며 빈 베틀을 자세히 들여다보았다. 궁정의 두 관리가 그토록 칭찬한 것이 자기에게는 보이지 않는다고는, 무슨 일이 있어도 말하고 싶지 않았기 때문이다. 이제 수행원들도 모두 눈에 힘을 주어, 베틀에서 무엇이든 찾아내려 했지만, 다른 사람들과 마찬가지로 아무것도 볼 수 없었다. 그럼에도 모두 “아, 얼마나 아름다운가!” 하고 외치며, 다가오는 행렬을 위해 이 훌륭한 천으로 새 옷을 지으시라고 폐하께 권했다. “장엄하구나! 아름답구나! 훌륭하구나!” 하는 소리가 사방에서 울려 퍼졌고, 모두가 유난히 들떠 있었다. 황제도 모두의 만족감에 동참하여, 사기꾼들에게 단춧구멍에 달 기사 훈장의 띠와 ‘직공 신사’라는 칭호를 내렸다."
+    },
+    {
+      "source": "The rogues sat up the whole of the night before the day on which the\nprocession was to take place, and had sixteen lights burning, so that\neveryone might see how anxious they were to finish the Emperor's new\nsuit. They pretended to roll the cloth off the looms; cut the air with\ntheir scissors; and sewed with needles without any thread in them.\n“See!” cried they, at last. “The Emperor's new clothes are ready!”",
+      "ko": "행렬이 열리기 전날 밤, 사기꾼들은 밤을 꼬박 새우며 등불을 열여섯 개나 켜 놓았다. 황제의 새 옷을 완성하려고 자신들이 얼마나 애쓰는지 모두에게 보이려는 것이었다. 그들은 베틀에서 천을 감아 내리는 척하고, 가위로 허공을 자르고, 실도 꿰지 않은 바늘로 바느질했다. “보십시오!” 마침내 그들이 외쳤다. “황제 폐하의 새 옷이 완성되었습니다!”"
+    },
+    {
+      "source": "And now the Emperor, with all the grandees of his court, came to the\nweavers; and the rogues raised their arms, as if in the act of holding\nsomething up, saying, “Here are your Majesty's trousers! Here is the\nscarf! Here is the mantle! The whole suit is as light as a cobweb;\none might fancy one has nothing at all on, when dressed in it; that,\nhowever, is the great virtue of this delicate cloth.”",
+      "ko": "이제 황제가 궁정의 고관들을 모두 데리고 직공들에게 왔다. 사기꾼들은 무언가를 들어 올리는 듯 두 팔을 치켜들며 말했다. “여기 폐하의 바지가 있습니다! 여기 목도리가 있습니다! 여기 망토가 있습니다! 한 벌 전체가 거미줄처럼 가볍습니다. 입고 있어도 아무것도 걸치지 않은 것처럼 느끼실 수 있습니다. 하지만 그것이야말로 이 섬세한 천의 큰 장점이지요.”"
+    },
+    {
+      "source": "“Yes indeed!” said all the courtiers, although not one of them could see\nanything of this exquisite manufacture.",
+      "ko": "“참으로 그렇군!” 궁정 신하들이 모두 말했다. 그들 가운데 이 정교한 직물을 조금이라도 볼 수 있는 사람은 단 하나도 없었는데도 말이다."
+    },
+    {
+      "source": "“If your Imperial Majesty will be graciously pleased to take off your\nclothes, we will fit on the new suit, in front of the looking glass.”",
+      "ko": "“황제 폐하께서 은혜로이 옷을 벗어 주신다면, 거울 앞에서 새 옷을 맞추어 입혀 드리겠습니다.”"
+    },
+    {
+      "source": "The Emperor was accordingly undressed, and the rogues pretended to\narray him in his new suit; the Emperor turning round, from side to side,\nbefore the looking glass.",
+      "ko": "그래서 황제는 옷을 벗었고, 사기꾼들은 황제에게 새 옷을 입히는 척했다. 황제는 거울 앞에서 이쪽저쪽으로 몸을 돌렸다."
+    },
+    {
+      "source": "“How splendid his Majesty looks in his new clothes, and how well they\nfit!” everyone cried out. “What a design! What colors! These are indeed\nroyal robes!”",
+      "ko": "“폐하께서 새 옷을 입으시니 얼마나 훌륭해 보이시며, 또 얼마나 잘 맞는가!” 모두가 외쳤다. “이런 무늬라니! 이런 색깔이라니! 참으로 제왕의 옷이로다!”"
+    },
+    {
+      "source": "“The canopy which is to be borne over your Majesty, in the procession,\nis waiting,” announced the chief master of the ceremonies.",
+      "ko": "“행렬에서 폐하의 머리 위에 받쳐 들 천개가 기다리고 있사옵니다.” 의전 책임자가 알렸다."
+    },
+    {
+      "source": "“I am quite ready,” answered the Emperor. “Do my new clothes fit well?”\n asked he, turning himself round again before the looking glass, in order\nthat he might appear to be examining his handsome suit.",
+      "ko": "“나는 준비가 다 되었다.” 황제가 대답했다. “새 옷이 잘 맞느냐?” 황제는 멋진 옷을 살피는 것처럼 보이려고 거울 앞에서 다시 몸을 돌리며 물었다."
+    },
+    {
+      "source": "The lords of the bedchamber, who were to carry his Majesty's train felt\nabout on the ground, as if they were lifting up the ends of the mantle;\nand pretended to be carrying something; for they would by no means\nbetray anything like simplicity, or unfitness for their office.",
+      "ko": "폐하의 긴 옷자락을 받쳐 들게 된 시종 귀족들은, 망토 끝을 들어 올리기라도 하듯 땅바닥을 더듬고, 무언가를 들고 가는 척했다. 자신들이 어리석거나 직책에 어울리지 않는다는 낌새는, 어떤 식으로든 드러내고 싶지 않았기 때문이다."
+    },
+    {
+      "source": "So now the Emperor walked under his high canopy in the midst of the\nprocession, through the streets of his capital; and all the people\nstanding by, and those at the windows, cried out, “Oh! How beautiful\nare our Emperor's new clothes! What a magnificent train there is to\nthe mantle; and how gracefully the scarf hangs!” in short, no one would\nallow that he could not see these much-admired clothes; because, in\ndoing so, he would have declared himself either a simpleton or unfit\nfor his office. Certainly, none of the Emperor's various suits, had ever\nmade so great an impression, as these invisible ones.",
+      "ko": "그리하여 이제 황제는 행렬 한가운데에서 높이 받쳐 든 천개 아래를 걸으며 수도의 거리를 지나갔다. 길가에 서 있는 사람들과 창가의 사람들이 모두 외쳤다. “아! 우리 황제 폐하의 새 옷은 얼마나 아름다운가! 망토의 긴 옷자락은 얼마나 훌륭하고, 목도리는 또 얼마나 우아하게 드리워졌는가!” 요컨대, 그토록 칭송받는 옷이 자기에게는 보이지 않는다고 인정하는 사람은 아무도 없었다. 그렇게 하면 자신이 바보이거나 자기 직책에 어울리지 않는 사람이라고 선언하는 셈이었기 때문이다. 분명, 황제가 지닌 갖가지 옷 가운데 이 보이지 않는 옷만큼 큰 감명을 준 옷은 일찍이 없었다."
+    },
+    {
+      "source": "“But the Emperor has nothing at all on!” said a little child.",
+      "ko": "“하지만 황제님은 아무것도 안 입으셨는데!” 어린아이가 말했다."
+    },
+    {
+      "source": "“Listen to the voice of innocence!” exclaimed his father; and what the\nchild had said was whispered from one to another.",
+      "ko": "“천진한 목소리를 들어 보시오!” 아이의 아버지가 외쳤다. 그러자 아이가 한 말이 사람들의 입에서 입으로 속삭임을 타고 전해졌다."
+    },
+    {
+      "source": "“But he has nothing at all on!” at last cried out all the people.\nThe Emperor was vexed, for he knew that the people were right; but he\nthought the procession must go on now! And the lords of the bedchamber\ntook greater pains than ever, to appear holding up a train, although, in\nreality, there was no train to hold.",
+      "ko": "“하지만 아무것도 안 입으셨잖아!” 마침내 모든 사람이 외쳤다. 황제는 사람들의 말이 옳다는 것을 알았기에 속이 상했다. 하지만 이제 행렬은 계속되어야 한다고 생각했다! 그래서 시종 귀족들은 긴 옷자락을 받쳐 드는 것처럼 보이려고 그 어느 때보다 더 애를 썼다. 실제로는 받쳐 들 옷자락이 없었는데도 말이다."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "body",
+      "title": "본문",
+      "start": 0,
+      "end": 32,
+      "rangeConvention": "zero-based, end-exclusive"
+    }
+  ],
+  "translationNote": "이 번역은 지정된 공개 원문 파일을 바탕으로 새로 작성한 AI 한국어 번역이며, 전문 번역가의 교열 전입니다. 원문 문장·문단 순서를 보존하며 기존 한국어 초안이나 출판사 번역문을 사용하지 않습니다. 덴마크어 원작을 Project Gutenberg #1597의 영어판을 거쳐 한국어로 옮긴 중역입니다. 카탈로그에 해당 영어판 번역자 표기가 없습니다.",
+  "reviewedParagraphs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "updatedAt": "2026-10-31T17:52:46+09:00"
+}
