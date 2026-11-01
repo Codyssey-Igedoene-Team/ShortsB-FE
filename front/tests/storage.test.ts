@@ -20,6 +20,7 @@ import {
   advance,
   resumeBook,
   setDailyGoal,
+  goalStats,
 } from "../src/domain/reading";
 import { resolveLocation } from "../src/app/routes";
 import { DEMO_USER, authenticateDemo } from "./auth-fixture";
@@ -206,6 +207,41 @@ test("different server users cannot inherit one another's local reading state", 
   assert.equal(restore(storage).state.demoAccountComplete, false);
 });
 
+test("first login starts at zero instead of adopting anonymous browser reading records", () => {
+  const storage = memory();
+  let guest = startSession(
+    setDailyGoal(defaults(), { unit: "pages", value: 10 }),
+    "selfish-giant",
+  );
+  for (let i = 0; i < 4; i++) guest = advance(guest);
+  assert.equal(goalStats(guest).current, 4);
+  persist(storage, guest);
+
+  const member = bindServerAccount(storage, restore(storage).state, "new-user");
+  assert.equal(goalStats(member).current, 0);
+  assert.deepEqual(member.readLog, []);
+  assert.deepEqual(member.history, []);
+  assert.deepEqual(member.progress, {});
+  assert.deepEqual(member.completedDays, []);
+  assert.equal(member.setupCompleted, false);
+
+  const planned = startSession(
+    setDailyGoal(member, { unit: "pages", value: 10 }),
+    "selfish-giant",
+  );
+  assert.equal(planned.active?.cursor, 3);
+  assert.equal(planned.active?.end, 7);
+  assert.equal(goalStats(planned).current, 0);
+  const read = advance(planned);
+  assert.equal(goalStats(read).current, 1);
+  persist(storage, read);
+
+  const returning = bindServerAccount(storage, guest, "new-user");
+  assert.deepEqual(returning.readLog, read.readLog);
+  assert.equal(goalStats(returning).current, 1);
+  assert.equal(returning.active?.cursor, 4);
+});
+
 test("test backups can only be restored for the verified original account", () => {
   const storage = memory();
   const original = {
@@ -219,14 +255,18 @@ test("test backups can only be restored for the verified original account", () =
   assert.ok(endOnboardingTest(storage, "user-1"));
 });
 
-test("login removes the trial cap and goal ten stops at this eight-page book's last page", () => {
+test("verified account refresh removes the trial cap and goal ten stops at the last page", () => {
   const storage = memory();
   const trial = startSession(defaults(), "emperor-clothes", {
     start: 0,
     mode: "trial",
   });
   assert.equal(trial.active?.end, 2);
-  const member = bindServerAccount(storage, trial, "local-test-user");
+  const member = bindServerAccount(
+    storage,
+    { ...trial, demoUserId: "local-test-user" },
+    "local-test-user",
+  );
   const changed = setDailyGoal(member, { unit: "pages", value: 10 });
   assert.equal(changed.active?.mode, "book");
   assert.equal(changed.active?.cursor, 0);

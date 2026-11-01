@@ -10,7 +10,6 @@ import {
   Icon,
   Progress,
   SaveButton,
-  Scene,
 } from "../components/UI";
 export function HomePage() {
   const { state, go, start, resume, update } = useApp(),
@@ -34,16 +33,12 @@ export function HomePage() {
           {active && <small className="reading-state">이어 읽는 책</small>}
           <h1>{b.book}</h1>
           <p>{b.author}</p>
-          <span className="edition-badge">{b.editionLabel}</span>
           <SaveButton book={b} />
         </div>
       </div>
       {active ? (
         <>
           <Progress book={b} />
-          <p className="muted small">
-            다음 이야기는 {offset + 1}쪽에서 기다리고 있어요.
-          </p>
         </>
       ) : (
         <section className="why-this-book">
@@ -73,54 +68,38 @@ export function HomePage() {
           <Icon name="book" />
         </Button>
         <p className="reading-note">
-          {offset + 1}–{offset + n}쪽 ·{" "}
-          {b.translationNote ? "AI 번역 · 교열 전" : "한국어 원문 전문"}
+          {offset + 1}–{offset + n}쪽
         </p>
       </div>
       <DailyGoal />
-      {active ? (
-        <button className="text-button centered" onClick={() => setFresh(true)}>
-          새로운 책 추천받기
+      <div className="recommend-feedback">
+        <button
+          aria-pressed={state.feedback[b.id] === "like"}
+          onClick={() =>
+            update((s) => ({
+              ...s,
+              feedback: {
+                ...s.feedback,
+                [b.id]: s.feedback[b.id] === "like" ? "" : "like",
+              },
+            }))
+          }
+        >
+          <Icon name="heart" />
+          {state.feedback[b.id] === "like"
+            ? "취향에 반영했어요"
+            : "이런 책 좋아요"}
         </button>
-      ) : (
-        <>
-          <div className="recommend-feedback">
-            <button
-              aria-pressed={state.feedback[b.id] === "like"}
-              onClick={() =>
-                update((s) => ({
-                  ...s,
-                  feedback: {
-                    ...s.feedback,
-                    [b.id]: s.feedback[b.id] === "like" ? "" : "like",
-                  },
-                }))
-              }
-            >
-              <Icon name="heart" />
-              {state.feedback[b.id] === "like"
-                ? "취향에 반영했어요"
-                : "이런 책 좋아요"}
-            </button>
-            <button
-              onClick={() =>
-                setSeen((s) => (s.length > 12 ? [b.id] : [...s, b.id]))
-              }
-            >
-              다른 책 보기
-              <Icon name="redo" />
-            </button>
-          </div>
-          <details className="home-preview">
-            <summary>
-              어떤 장면부터 읽나요?
-              <Icon name="down" />
-            </summary>
-            <Scene book={b} />
-            <p className="small muted">{b.guide.context}</p>
-          </details>
-        </>
-      )}
+        <button
+          onClick={() => {
+            setFresh(true);
+            setSeen((s) => (s.length > 12 ? [b.id] : [...s, b.id]));
+          }}
+        >
+          다른 책 보기
+          <Icon name="redo" />
+        </button>
+      </div>
       <button className="journal-link" onClick={() => go("calendar")}>
         <span className="journal-icon">
           <Icon name="calendar" />

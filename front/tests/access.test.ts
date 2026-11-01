@@ -39,15 +39,15 @@ test("home and book details use the same daily goal with no separate dose select
     ).replace(/<!--.*?-->/g, "");
   for (const page of ["home", "book"] as const) {
     const before = render(state, page);
-    assert.ok(before.includes("오늘 남은 목표 3페이지"));
+    assert.ok(!before.includes("오늘 남은 목표"));
     assert.ok(before.includes("3페이지부터 5페이지까지 읽기"));
     assert.ok(!before.includes("<select"));
     const after = render(
       setDailyGoal(state, { unit: "pages", value: 10 }),
       page,
     );
-    assert.ok(after.includes("오늘 남은 목표 8페이지"));
-    assert.ok(after.includes("이번에 읽을 분량 8페이지"));
+    assert.ok(!after.includes("오늘 남은 목표"));
+    assert.ok(!after.includes("이번에 읽을 분량"));
     assert.ok(after.includes("3페이지부터 10페이지까지 읽기"));
     const done = render(setDailyGoal(state, { unit: "pages", value: 1 }), page);
     assert.ok(done.includes("오늘 목표 완료"));

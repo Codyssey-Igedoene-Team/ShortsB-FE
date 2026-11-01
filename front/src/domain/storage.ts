@@ -92,10 +92,12 @@ export function bindServerAccount(
   testing = false,
 ): State {
   const saved = testing ? null : restoreAccount(storage, id);
+  // Unowned browser data may belong to an earlier guest or demo session.
+  // A new account starts fresh; only that account's own records are restored.
   const base =
     current.demoUserId === id
       ? current
-      : saved || (current.demoUserId === null ? current : defaults());
+      : saved || defaults();
   return syncReadingPlan({
     ...base,
     demoUserId: id,

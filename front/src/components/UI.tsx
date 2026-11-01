@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import coverData from "../data/covers.json";
 import { useApp } from "../state/AppContext";
 import type { Route } from "../app/routes";
-import { dose, estimated, goalStats, readPages } from "../domain/reading";
+import { dose, goalStats, readPages } from "../domain/reading";
 import { workLabel } from "../domain/catalog";
 import type { Book, Goal, Session } from "../domain/types";
 const paths: Record<string, string> = {
@@ -263,22 +263,13 @@ export function ReadingPlan({
     n = session ? session.end - session.cursor : dose(state, b, start);
   return (
     <div className="reading-dose">
-      <div className="reading-plan-summary" role="status">
-        <strong>
-          {trial
-            ? `체험 읽기 ${n}페이지`
-            : g.done
-              ? "오늘 목표 완료"
-              : `오늘 남은 목표 ${g.value - g.current}페이지`}
-        </strong>
-        <span>
-          {trial ? "첫 두 페이지까지 읽어요" : `이번에 읽을 분량 ${n}페이지`}
-        </span>
-      </div>
-      <small>
-        전체 {b.totalPages}페이지
-        <br />약 {estimated(b.parts.slice(start, start + n).join(" "))}분
-      </small>
+      {(trial || g.done) && (
+        <div className="reading-plan-summary" role="status">
+          <strong>{trial ? `체험 읽기 ${n}페이지` : "오늘 목표 완료"}</strong>
+          {trial && <span>첫 두 페이지까지 읽어요</span>}
+        </div>
+      )}
+      <small>전체 {b.totalPages}페이지</small>
     </div>
   );
 }

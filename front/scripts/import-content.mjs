@@ -2,6 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 const root = path.resolve(import.meta.dirname, "..");
+const libraryFile = path.join(root, "content-source/library/books.json");
+if (fs.existsSync(libraryFile)) {
+  const { buildLibrary } = await import("./library-content.mjs");
+  const bundle = JSON.parse(fs.readFileSync(libraryFile, "utf8"));
+  const metadata = JSON.parse(fs.readFileSync(path.join(root, "content-source/library/editorial.json"), "utf8"));
+  const base = JSON.parse(fs.readFileSync(path.join(root, "content-source/catalog.json"), "utf8"));
+  const books = buildLibrary(bundle, metadata);
+  fs.writeFileSync(path.join(root, "src/data/catalog.json"), JSON.stringify({ books, relations: base.relations, alternatives: base.alternatives }));
+  console.log(`Content: ${books.length} complete Korean editions; supplied pages and SHA-256 verified.`);
+  process.exit(0);
+}
 const source = JSON.parse(
   fs.readFileSync(path.join(root, "content-source/catalog.json"), "utf8"),
 );
