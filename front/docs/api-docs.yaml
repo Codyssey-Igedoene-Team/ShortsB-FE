@@ -1,0 +1,1245 @@
+openapi: 3.1.0
+info:
+  title: ShortSB API
+  description: |
+    ## 로컬 인증 테스트 순서
+
+    1. [구글 로그인 시작](/oauth2/authorization/google)을 **새 탭에서 열어** 로그인하세요.
+       완료 후 이 Swagger 탭으로 돌아옵니다. 세션 쿠키는 같은 브라우저에서 자동 전달됩니다.
+       성공 URL의 프런트가 실행 중이 아니어도 아래 내 정보 조회로 로그인 결과를 확인할 수 있습니다.
+    2. **회원 → 로그인한 내 정보 조회 → Try it out → Execute**로 200과 회원 정보를 확인합니다.
+    3. **인증 → CSRF 토큰 조회 → Try it out → Execute** 후 실제 응답의 `token`을 복사합니다.
+    4. **인증 → 로그아웃 → Try it out**에서 `X-CSRF-TOKEN`에 복사한 토큰을 넣고 Execute합니다.
+       정상 결과는 **204(응답 본문 없음)** 입니다.
+    5. 내 정보 조회를 다시 Execute하면 **401 / AUTHENTICATION_REQUIRED**가 반환돼야 합니다.
+
+    로그인·로그아웃 후에는 CSRF 토큰을 다시 조회하세요. Example Value의 값이 아닌 실제 응답 토큰을 사용합니다.
+    비로그인 상태의 내 정보 조회 401, 로그인 상태에서 잘못된 CSRF 토큰으로 로그아웃할 때 403도 확인할 수 있습니다.
+    구글 로그인은 위 링크로 페이지를 이동해 진행합니다. 클라이언트 비밀값이나 세션 쿠키를 문서에 입력하지 않습니다.
+
+    ## 첫 추천·발췌 사용 순서
+
+    로그인·CSRF 토큰 조회 후 **추천 발췌 → 첫 추천 발췌 생성**에서 X-CSRF-TOKEN과 요청 본문을 입력하세요.
+    요청 예시 네 가지로 카드만·프롬프트만·둘 다·ANY 단독 경로를 확인할 수 있습니다.
+    생성 응답의 previewId는 발췌 재조회에, book.bookId는 도서 정보 조회에 사용합니다.
+    실제 데이터 등록과 작품 권한 승인이 먼저 필요합니다. 벡터 검색은 본문/카드 벡터 등록이 필요하고,
+    프롬프트 입력은 FastAPI GPU 연결도 필요합니다.
+
+    ## 대비 발췌 사용 순서
+
+    첫 추천의 previewId와 현재 CSRF 토큰을 **대비 발췌 → 대비 작품 발췌 추천**에 입력하세요.
+    CSV 후보뿐 아니라 양쪽 작품 승인과 실제 근거 검수가 필요합니다.
+    200·available=false는 적합한 승인 관계가 없는 정상 결과입니다. 모델/본문 준비 오류 503과 구분합니다.
+    성공하면 contrast.book.bookId, 첫 작품이면 기존 book.bookId를 전체 독서 시작에 사용하세요.
+
+    ## 전체 독서 사용 순서
+
+    **전체 독서 → 시작**에서 bookId를 문자열로 입력하고 sessionId·version을 확인하세요.
+    페이지 조회 후 위치 저장에 pageNo·position·version·status를 전달합니다. position은 UTF-16 기준입니다.
+    중단 시 status를 paused로 저장하고, 최근 미완료 조회에서 이어 읽을 현재 위치를 확인합니다.
+    마지막 페이지 끝을 저장한 뒤 완료 요청에 최신 version을 전달하세요.
+    409 응답의 current를 반영하며 과거 요청의 version만 바꿔 자동 재전송하지 않습니다.
+    전체 독서 SQL 적용과 승인 도서 등록이 먼저 필요합니다. GPU 연결은 독서 API에 필요하지 않습니다.
+  version: R4
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: 추천 발췌
+  description: 쪽수·카드·선택 프롬프트 기반 첫 추천과 세션 발췌 재조회
+- name: 대비 발췌
+  description: 첫 발췌 안의 검수 근거와 연결되는 다른 작품 추천
+- name: 도서
+  description: 제공 승인된 작품의 정보·출처·번역 안내 조회
+- name: 인증
+  description: 구글 로그인 후 같은 브라우저의 세션 쿠키로 테스트한다. CSRF 조회 후 로그아웃을 실행한다.
+- name: 회원
+  description: 현재 로그인한 회원의 정보를 조회한다.
+- name: 전체 독서
+  description: 승인 도서 전체 읽기·현재/최대 위치 저장·재개·완료
+paths:
+  /api/logout:
+    post:
+      tags:
+      - 인증
+      summary: 로그아웃
+      description: |
+        구글 로그인과 CSRF 토큰 조회를 먼저 수행하세요.
+        X-CSRF-TOKEN에 현재 응답의 token을 입력하면 세션을 무효화하고 JSESSIONID 쿠키를 제거합니다.
+        요청 본문은 없습니다. 성공 후 내 정보 조회는 401이어야 하며,
+        재로그인 후에는 새 CSRF 토큰이 필요합니다.
+        비로그인 요청은 유효한 CSRF 토큰이 있어도 401입니다. CSRF 검증이 먼저 실패하면 403입니다.
+      operationId: logout
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf의 실제 응답에서 복사한 token 값
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: 로그아웃 성공. 응답 본문 없음
+        "401":
+          description: 로그인 필요 또는 세션 만료
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                message: 로그인이 필요합니다.
+                code: AUTHENTICATION_REQUIRED
+        "403":
+          description: CSRF 토큰 누락·위조·이전 세션의 토큰
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                message: CSRF 토큰을 다시 확인해주세요.
+                code: CSRF_INVALID
+  /api/reading-sessions:
+    post:
+      tags:
+      - 전체 독서
+      summary: 전체 독서 시작 또는 기존 기록 재개
+      description: |
+        구글 로그인 후 GET /api/csrf의 실제 token을 X-CSRF-TOKEN에 입력하세요.
+        발췌 응답의 book.bookId를 문자열로 전달합니다. 예: {"bookId":"1"}
+        새 기록은 1페이지·위치 0·version "0"으로 시작합니다. 기존 미완료 기록이 있으면 위치·상태·버전을 유지해 반환합니다.
+        완료한 책을 다시 선택하면 새 기록을 만듭니다. 발췌 쪽수는 전체 진행량에 합산하지 않습니다.
+        시작 후 페이지 조회는 별도 호출하고, 실제 재개 상태는 progress에 reading으로 저장하세요.
+      operationId: start
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf 실제 응답 token
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Start"
+        required: true
+      responses:
+        "201":
+          description: 새 전체 독서 기록
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+        "200":
+          description: 기존 미완료 기록 재사용
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/reading-sessions/{sessionId}/complete:
+    post:
+      tags:
+      - 전체 독서
+      summary: 책 전체 독서 완료
+      description: |
+        먼저 마지막 페이지 끝을 progress로 저장하세요. 저장 응답의 최신 version을 문자열로 전달합니다. 예: {"version":"1"}
+        현재 위치가 마지막 끝이어야 하며 과거에 끝에 갔다가 앞부분으로 돌아온 상태는 완료할 수 없습니다.
+        완료 성공 시 version이 증가합니다. 같은 최신 version으로 다시 완료하면 기존 결과를 반환합니다.
+        과거 version 재전송은 409와 최신 current입니다. 100% 도달과 completed 상태는 구분합니다.
+      operationId: complete
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf 실제 응답 token
+        required: true
+        schema:
+          type: string
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Complete"
+        required: true
+      responses:
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: 전체 완료 기록
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+  /api/previews:
+    post:
+      tags:
+      - 추천 발췌
+      summary: 첫 추천 발췌 생성
+      description: |
+        1. 구글 로그인 후 GET /api/csrf의 실제 응답 token을 X-CSRF-TOKEN에 입력하세요.
+        2. requestedPageCount(정수 1~10)와 storyType(WARM/HUMOR/THOUGHTFUL/ANY)을 입력하세요.
+        3. prompt는 선택이며 UTF-16 2,000단위 이하입니다. null·빈 문자열·공백만 입력하면 프롬프트 없이 처리합니다.
+        카드만은 사전 벡터, 프롬프트가 있으면 FastAPI query 벡터를 사용합니다. 함께 입력하면 기본 카드 40%·프롬프트 60%입니다.
+        ANY만 선택하면 GPU 없이 작품별 균등 선택 후 첫 페이지부터 제공합니다.
+        10쪽 요청에 총 8쪽 작품이면 8쪽을 반환합니다. book에 작품 전체 쪽수·출처·번역 안내가 있습니다.
+        발췌는 세션에 최대 10개 보관하며 초과 시 가장 오래된 발췌가 제거됩니다. 전체 독서 진행률에는 합산하지 않습니다.
+        실행 전 도서 등록·권한 승인이 필요하며 벡터 검색에는 본문/카드 벡터 등록, 프롬프트에는 GPU 서버 연결도 필요합니다.
+      operationId: create
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf의 실제 응답 token. 로그인 후 새 토큰 사용
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PreviewRequest"
+            examples:
+              카드와 프롬프트:
+                description: 카드와 프롬프트
+                value:
+                  requestedPageCount: 5
+                  storyType: WARM
+                  prompt: 다시 시작할 용기를 얻고 싶어요
+              카드만:
+                description: 카드만
+                value:
+                  requestedPageCount: 10
+                  storyType: HUMOR
+              프롬프트만:
+                description: 프롬프트만
+                value:
+                  requestedPageCount: 3
+                  storyType: ANY
+                  prompt: 외로움에 관한 이야기
+              무작위 작품:
+                description: 무작위 작품
+                value:
+                  requestedPageCount: 10
+                  storyType: ANY
+        required: true
+      responses:
+        "201":
+          description: 첫 발췌 생성. Location 헤더로 재조회
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PreviewResponse"
+        "400":
+          description: 잘못된 쪽수·카드·프롬프트 또는 모델 입력 상한 초과
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·세션 만료
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: CSRF_INVALID. 현재 세션의 토큰 재조회 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: NO_RECOMMENDATION_CANDIDATES 또는 BOOK_NOT_FOUND
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 추천 처리 중 본문 버전 변경
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: 임베딩 서버 응답 형식 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 모델·벡터·본문 준비 부족 또는 GPU 연결/호환성 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/previews/{previewId}/contrast:
+    post:
+      tags:
+      - 대비 발췌
+      summary: 대비 작품 발췌 추천
+      description: |
+        1. 구글 로그인·CSRF 조회 후 첫 추천을 생성하세요.
+        2. 같은 세션의 첫 previewId와 현재 X-CSRF-TOKEN을 입력하세요. 요청 본문은 없습니다.
+        원래 요청 쪽수를 유지하며 양쪽 실제 근거를 담을 수 있는 승인 관계만 사용합니다.
+        후보가 없으면 200·available=false·NO_ELIGIBLE_CONTRAST이며 첫 작품의 전체 독서는 계속 가능합니다.
+        성공 시 contrast에 두 번째 작품·연속 페이지·검수한 공통 주제/축/이유·양쪽 근거가 있습니다.
+        첫 발췌와 같은 모델의 사전 벡터를 재사용하고 ANY 단독의 첫 발췌는 활성 모델을 사용합니다.
+        새 GPU 요청·두 번째 previewId 생성은 없습니다. 재요청하면 현재 승인 자료로 다시 계산합니다.
+        원하는 작품의 bookId를 전체 독서 시작 API에 전달하세요. CSV 후보만 등록한 상태에서는 대비가 제공되지 않습니다.
+      operationId: contrast
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf의 실제 응답 token
+        required: true
+        schema:
+          type: string
+      - name: previewId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: 대비 발췌 또는 후보 없음
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContrastResponse"
+        "400":
+          description: 잘못된 previewId 형식
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 현재 세션의 CSRF 토큰 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: PREVIEW_NOT_FOUND 또는 BOOK_NOT_FOUND
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 첫 발췌 본문 변경. 새 추천 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 필요한 벡터·본문·승인 근거의 준비/무결성 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/reading-sessions/{sessionId}/progress:
+    patch:
+      tags:
+      - 전체 독서
+      summary: 현재 위치·중단 상태 저장
+      description: |
+        로그인·CSRF 토큰이 필요합니다. 예: {"pageNo":1,"position":10,"version":"0","status":"reading"}
+        pageNo는 정수 1 이상, position은 해당 페이지의 UTF-16 위치 0~content.length입니다. 이모지 중간 위치는 거절합니다.
+        status는 reading 또는 paused입니다. 현재 위치를 뒤로 옮겨도 최대 위치와 진행률은 감소하지 않습니다.
+        성공 시 version이 증가합니다. 409의 current를 반영하고 과거 요청의 version만 바꿔 자동 재전송하지 마세요.
+        완료한 기록은 수정할 수 없습니다. 페이지 이동·중단·완료 직전에 위치를 저장하세요.
+      operationId: progress
+      parameters:
+      - name: X-CSRF-TOKEN
+        in: header
+        description: GET /api/csrf 실제 응답 token
+        required: true
+        schema:
+          type: string
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Progress"
+        required: true
+      responses:
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: 증가한 버전과 저장된 현재/최대 위치
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+  /api/reading-sessions/{sessionId}:
+    get:
+      tags:
+      - 전체 독서
+      summary: 전체 독서 상태 조회
+      description: |
+        시작 응답의 sessionId를 입력하세요. 현재 위치는 이어 읽기용이며 최대 위치는 감소하지 않는 진행률 계산용입니다.
+        진행률은 원본 페이지 본문 길이 기준이고, 발췌 분량은 포함하지 않습니다.
+        본인 소유가 아니거나 없는 기록은 404입니다. 본문 버전이 바뀌면 409이며 기존 위치를 자동 보정하지 않습니다.
+      operationId: get
+      parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+      responses:
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: 본인 전체 독서 상태
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+  /api/reading-sessions/{sessionId}/pages/{pageNo}:
+    get:
+      tags:
+      - 전체 독서
+      summary: 독서 페이지 조회
+      description: |
+        sessionId와 1부터 시작하는 pageNo를 입력하세요. 작품 전체 범위에서 페이지 하나를 가져옵니다.
+        응답은 pageNo·content입니다. content.length는 JavaScript에서 UTF-16 위치 상한으로 사용할 수 있습니다.
+        페이지 조회 자체로 독서 위치가 저장되지 않습니다. progress를 별도로 호출하세요.
+      operationId: page
+      parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+      - name: pageNo
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          exclusiveMinimum: 0
+      responses:
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: 원본 한 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponse"
+  /api/reading-sessions/current:
+    get:
+      tags:
+      - 전체 독서
+      summary: 최근 미완료 독서 조회
+      description: |
+        로그인 후 호출합니다. GET에는 CSRF 헤더가 필요 없습니다.
+        bookId를 생략하면 최근 저장한 미완료 기록 하나를, 지정하면 그 책의 미완료 기록을 반환합니다.
+        없으면 204이며 응답 본문이 없습니다. reading/paused 상태만 대상으로 하며 조회 자체는 위치·상태를 바꾸지 않습니다.
+      operationId: current
+      parameters:
+      - name: bookId
+        in: query
+        description: 선택한 책의 내부 ID. 생략 가능
+        required: false
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+        example: 1
+      responses:
+        "200":
+          description: 최근 미완료 기록
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReadingResponse"
+        "204":
+          description: 미완료 기록 없음
+        "400":
+          description: 입력 형식·페이지·위치 오류
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: 상태 변경 요청의 CSRF 토큰 누락·위조
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: 없는/타 회원 독서 기록·미승인 도서·없는 페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: 버전/완료 상태 충돌은 current 포함. 본문 변경은 code/message만 반환
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/ReadingConflictResponse"
+                - $ref: "#/components/schemas/ApiError"
+        "503":
+          description: 본문·저장 위치 데이터 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/previews/{previewId}:
+    get:
+      tags:
+      - 추천 발췌
+      summary: 저장된 발췌 재조회
+      description: |
+        첫 추천 응답의 previewId를 같은 로그인 세션에서 입력하세요. GPU 재호출 없이 저장했던 범위의 현재 본문을 조회합니다.
+        GET이므로 CSRF 헤더는 필요 없습니다. 다른 사용자의 발췌·보관 상한으로 제거된 발췌는 404입니다.
+        로그아웃·세션 만료·서버 재시작으로 발췌가 사라지면 새 추천을 요청하세요.
+        본문 버전이 변경되면 409, 작품이 미승인 상태가 되면 404이며 기존 본문을 그대로 노출하지 않습니다.
+      operationId: get_1
+      parameters:
+      - name: previewId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: 동일 발췌 범위의 작품 정보·페이지
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PreviewResponse"
+        "400":
+          description: 잘못된 UUID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: PREVIEW_NOT_FOUND 또는 BOOK_NOT_FOUND
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: PREVIEW_CONTENT_CHANGED. 새 추천 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: CONTENT_UNAVAILABLE. 본문 무결성 확인 필요
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/me:
+    get:
+      tags:
+      - 회원
+      summary: 로그인한 내 정보 조회
+      description: |
+        먼저 문서 상단의 구글 로그인 링크를 새 탭에서 열어 로그인하세요.
+        같은 브라우저의 세션 쿠키로 본인 정보를 조회하며 사용자 ID나 토큰을 직접 입력하지 않습니다.
+        회원 ID는 문자열입니다. 로그아웃 후 다시 Execute하면 401이 반환돼야 합니다.
+      operationId: me
+      responses:
+        "200":
+          description: 로그인한 회원 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+              example:
+                id: "1"
+                email: reader@example.com
+                nickname: 독자
+        "401":
+          description: 비로그인·세션 만료 또는 삭제된 회원
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+              example:
+                code: AUTHENTICATION_REQUIRED
+                message: 로그인이 필요합니다.
+        "500":
+          description: 회원 조회 중 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/csrf:
+    get:
+      tags:
+      - 인증
+      summary: CSRF 토큰 조회
+      description: |
+        로그인 전에도 호출할 수 있습니다. Try it out → Execute 후 실제 응답의 token을 복사하세요.
+        로그아웃 요청의 X-CSRF-TOKEN 입력란에 붙여넣습니다.
+        로그인·로그아웃 이후에는 기존 토큰을 재사용하지 말고 이 API를 다시 호출하세요.
+        세션 쿠키는 브라우저가 전달하며 별도 요청값은 없습니다.
+      operationId: csrf
+      responses:
+        "200":
+          description: 현재 세션의 토큰과 헤더 이름. 응답은 캐시하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfResponse"
+  /api/books/{bookId}:
+    get:
+      tags:
+      - 도서
+      summary: 도서 정보 조회
+      description: |
+        구글 로그인 후 발췌 응답의 book.bookId를 입력하세요. ID는 제공 자료의 문자열 ID가 아닌 서비스 내부 ID입니다.
+        제목·저자·전체 쪽수·판본·출처·번역 안내를 조회하며 전체 본문을 반환하지 않습니다.
+        미존재·미승인·원본 페이지가 준비되지 않은 작품은 모두 404입니다. GET 요청에는 CSRF 헤더가 필요 없습니다.
+      operationId: get_2
+      parameters:
+      - name: bookId
+        in: path
+        description: 발췌 응답의 book.bookId
+        required: true
+        schema:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+        example: 1
+      responses:
+        "200":
+          description: 승인 도서 정보
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BookResponse"
+        "400":
+          description: 양의 정수가 아닌 내부 도서 ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: 로그인 필요·삭제된 회원
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: BOOK_NOT_FOUND
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    Start:
+      type: object
+      description: 책 전체 독서 시작. 발췌 범위는 입력하지 않음
+      properties:
+        bookId:
+          type: string
+          description: 발췌 응답의 book.bookId. 문자열
+          example: "1"
+          minLength: 1
+          pattern: "[1-9][0-9]{0,18}"
+      required:
+      - bookId
+    ApiError:
+      type: object
+      description: API 공통 오류 응답
+      properties:
+        code:
+          type: string
+          description: 오류를 구분하는 코드
+          example: AUTHENTICATION_REQUIRED
+        message:
+          type: string
+          description: 사용자에게 안내할 메시지
+          example: 로그인이 필요합니다.
+    BookResponse:
+      type: object
+      description: 제공 승인을 받은 작품의 정보와 원본 출처 안내
+      properties:
+        bookId:
+          type: string
+          description: 서비스 내부 도서 ID. 문자열
+          example: "1"
+        title:
+          type: string
+          description: 작품 제목
+        author:
+          type: string
+          description: 저자 표시명
+        totalPageCount:
+          type: integer
+          format: int32
+          description: 서비스 전체 쪽수. 원본 pages 개수
+          example: 8
+        edition:
+          type: string
+          description: 확보한 판본 식별값
+        editionLabel:
+          type: string
+          description: 판본 표시 안내
+        language:
+          type: string
+          description: 본문 언어 코드
+          example: ko
+        workType:
+          type: string
+          description: 원본 자료의 작품 유형
+        sourceName:
+          type: string
+          description: 본문 출처 이름
+        sourceUrl:
+          type: string
+          description: 본문 출처 URL
+        licenseUrl:
+          type: string
+          description: 이용 조건 URL. 없으면 null
+        licenseLabel:
+          type: string
+          description: 이용 조건 표시. 없으면 null
+        credits:
+          type: string
+          description: 출처·기여자 표시. 없으면 null
+        translationNote:
+          type: string
+          description: AI 번역·교열 전 등 원본 자료의 안내. 원문 그대로 제공
+    ReadingConflictResponse:
+      type: object
+      description: 409 충돌 응답. 과거 요청의 version만 바꿔 자동 재전송하지 않음
+      properties:
+        code:
+          type: string
+          description: READING_VERSION_CONFLICT / READING_ALREADY_COMPLETED / READING_NOT_AT_END
+        message:
+          type: string
+          description: 충돌 안내
+        current:
+          $ref: "#/components/schemas/ReadingResponse"
+          description: 클라이언트가 반영할 최신 상태
+    ReadingResponse:
+      type: object
+      description: "책 전체 독서 기록. 현재 위치는 재개용, 최대 위치는 진행률 계산용"
+      properties:
+        sessionId:
+          type: string
+          description: 전체 독서 세션 ID. 문자열
+          example: "1"
+        book:
+          $ref: "#/components/schemas/BookResponse"
+          description: 승인 도서와 전체 쪽수·출처
+        currentPageNo:
+          type: integer
+          format: int32
+          description: 재개할 현재 페이지. 1-based
+          example: 1
+        currentPosition:
+          type: integer
+          format: int32
+          description: 현재 페이지 내 UTF-16 위치
+          example: 0
+        furthestPageNo:
+          type: integer
+          format: int32
+          description: 최대 도달 페이지
+        furthestPosition:
+          type: integer
+          format: int32
+          description: 최대 도달 페이지 내 UTF-16 위치
+        progressPercent:
+          type: number
+          description: 최대 본문 위치 기준 0~100. 소수 둘째 자리까지 내림
+          example: 12.34
+        status:
+          type: string
+          description: reading / paused / completed
+        version:
+          type: string
+          description: 저장 버전. 변경 요청에 그대로 전달할 문자열
+          example: "0"
+        startedAt:
+          type: string
+          format: date-time
+          description: 전체 독서 시작 시각
+        updatedAt:
+          type: string
+          format: date-time
+          description: 마지막 저장 시각
+        completedAt:
+          type: string
+          format: date-time
+          description: 전체 완료 시각. 미완료면 null
+    Complete:
+      type: object
+      description: 마지막 페이지 끝을 저장한 후 최신 version으로 전체 완료
+      properties:
+        version:
+          type: string
+          description: 최신 저장 응답의 version. 문자열
+          example: "1"
+          minLength: 1
+          pattern: "[0-9]{1,19}"
+      required:
+      - version
+    PreviewRequest:
+      type: object
+      description: 첫 추천 요청. 쪽수·카드는 필수이며 프롬프트는 선택
+      properties:
+        requestedPageCount:
+          type: string
+          format: int32
+          description: 보고 싶은 쪽수. 1~10 정수
+          example: 5
+          maximum: 10
+          minimum: 1
+        storyType:
+          type: string
+          description: 이야기 카드 하나. ANY도 명시적으로 선택
+          enum:
+          - WARM
+          - HUMOR
+          - THOUGHTFUL
+          - ANY
+          example: WARM
+        prompt:
+          type: string
+          description: "선택 자유 프롬프트. UTF-16 2,000단위 이하. 공백만 있으면 입력 없음"
+          example: 다시 시작할 용기를 얻고 싶어요
+          maxLength: 2000
+          minLength: 0
+      required:
+      - requestedPageCount
+      - storyType
+    PageResponse:
+      type: object
+      description: 분할을 변경하지 않은 원본 표시 페이지
+      properties:
+        pageNo:
+          type: integer
+          format: int32
+          description: 1부터 시작하는 페이지 번호
+          example: 1
+        content:
+          type: string
+          description: 해당 페이지 본문. 생성된 요약이 아닌 저장 원문
+    PreviewResponse:
+      type: object
+      description: 첫 발췌 결과. 요청 쪽수와 실제 제공 쪽수를 구분하며 독서 진행률에는 합산하지 않음
+      properties:
+        previewId:
+          type: string
+          description: 세션에 보관된 발췌 UUID. 조회와 후속 대비 참조에 사용
+        book:
+          $ref: "#/components/schemas/BookResponse"
+          description: 도서·출처·번역 안내
+        requestedPageCount:
+          type: integer
+          format: int32
+          description: 원래 요청 쪽수. 후속 대비에도 같은 값 적용
+          example: 10
+        actualPageCount:
+          type: integer
+          format: int32
+          description: "실제 제공 쪽수. min(요청,작품 전체)"
+          example: 8
+        startPageNo:
+          type: integer
+          format: int32
+          description: 발췌 시작 페이지. 1부터 시작
+          example: 1
+        endPageNo:
+          type: integer
+          format: int32
+          description: 발췌 끝 페이지. 포함
+          example: 8
+        storyType:
+          type: string
+          description: 요청 시 선택한 카드
+          enum:
+          - WARM
+          - HUMOR
+          - THOUGHTFUL
+          - ANY
+        recommendationType:
+          type: string
+          description: "RANDOM, CARD, PROMPT, CARD_AND_PROMPT 중 추천 경로"
+        matchedPageNo:
+          type: integer
+          format: int32
+          description: 벡터 검색으로 선택한 기준 페이지. RANDOM이면 null
+        reason:
+          type: string
+          description: 실제 추천 방식 안내. 생성형 본문 해석이 아닌 고정 설명
+        pages:
+          type: array
+          description: 시작~끝의 순서대로 제공하는 원본 페이지
+          items:
+            $ref: "#/components/schemas/PageResponse"
+    ContrastResponse:
+      type: object
+      description: 첫 발췌와 연결된 대비 결과. 후보 없음도 정상 200 응답
+      properties:
+        available:
+          type: boolean
+          description: 대비 제공 가능 여부
+        sourcePreviewId:
+          type: string
+          description: 첫 발췌 UUID
+        reasonCode:
+          type: string
+          description: "없으면 NO_ELIGIBLE_CONTRAST, 성공이면 null"
+        contrast:
+          $ref: "#/components/schemas/Result"
+          description: 대비 결과. 후보가 없으면 null
+    EvidenceReference:
+      type: object
+      properties:
+        bookId:
+          type: string
+          description: 내부 작품 ID. 문자열
+        startPageNo:
+          type: integer
+          format: int32
+          description: 근거 첫 페이지
+        endPageNo:
+          type: integer
+          format: int32
+          description: 근거 마지막 페이지. 포함
+        quote:
+          type: string
+          description: 지정 범위에 실제 포함된 검수 구절
+    Result:
+      type: object
+      properties:
+        relationId:
+          type: string
+          description: 승인된 대비 관계 ID. 문자열
+        contrastAxis:
+          type: string
+          description: texture/perspective/tone/attitude/ending/setting
+        contrastAxisLabel:
+          type: string
+          description: 대비 축의 한국어 표시
+        commonTopic:
+          type: string
+          description: 사람이 검수한 공통 주제
+        reason:
+          type: string
+          description: 양쪽 실제 근거로 검수한 대비 설명
+        requestedPageCount:
+          type: integer
+          format: int32
+          description: 원래 요청 쪽수
+        actualPageCount:
+          type: integer
+          format: int32
+          description: 대비 작품 실제 제공 쪽수
+        book:
+          $ref: "#/components/schemas/BookResponse"
+          description: 대비 작품. bookId로 전체 독서 시작 가능
+        startPageNo:
+          type: integer
+          format: int32
+          description: 대비 발췌 시작 페이지
+        endPageNo:
+          type: integer
+          format: int32
+          description: 대비 발췌 끝 페이지. 포함
+        sourceEvidence:
+          $ref: "#/components/schemas/EvidenceReference"
+          description: 첫 발췌 내부의 승인 근거
+        targetEvidence:
+          $ref: "#/components/schemas/EvidenceReference"
+          description: 두 번째 발췌 내부의 승인 근거
+        pages:
+          type: array
+          description: 대비 작품의 원본 연속 페이지
+          items:
+            $ref: "#/components/schemas/PageResponse"
+    Progress:
+      type: object
+      description: 현재 위치와 상태 저장. 조회한 version을 그대로 전달
+      properties:
+        pageNo:
+          type: string
+          description: 1-based 현재 페이지
+          example: 1
+          minimum: 1
+        position:
+          type: string
+          description: 페이지 내 UTF-16 위치. 끝 위치도 허용
+          example: 10
+          minimum: 0
+        version:
+          type: string
+          description: 조회 응답의 version. 문자열
+          example: "0"
+          minLength: 1
+          pattern: "[0-9]{1,19}"
+        status:
+          type: string
+          description: 읽는 중 또는 중단
+          enum:
+          - reading
+          - paused
+          example: reading
+          pattern: reading|paused
+      required:
+      - pageNo
+      - position
+      - status
+      - version
+    MeResponse:
+      type: object
+      description: 현재 세션으로 인증된 회원 정보
+      properties:
+        id:
+          type: string
+          description: 서비스 내부 회원 ID. JavaScript 정밀도 손실 방지를 위한 문자열
+          example: "1"
+        email:
+          type: string
+          description: 구글에서 확인한 이메일
+          example: reader@example.com
+        nickname:
+          type: string
+          description: 표시 이름. 등록된 이름이 없으면 null
+          example: 독자
+    CsrfResponse:
+      type: object
+      description: 상태 변경 요청에 사용할 세션 기반 CSRF 토큰
+      properties:
+        token:
+          type: string
+          description: Execute 후 실제 응답에서 복사할 토큰. 로그인·로그아웃 후 다시 조회한다.
+        headerName:
+          type: string
+          description: 토큰을 전달할 HTTP 헤더 이름
+          example: X-CSRF-TOKEN
+      required:
+      - headerName
+      - token

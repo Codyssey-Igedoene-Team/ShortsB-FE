@@ -1,0 +1,33 @@
+{
+  "name": "shortb",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host localhost",
+    "content": "node scripts/import-content.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "build": "npm run content && npm run typecheck && node scripts/build.mjs",
+    "preview": "vite preview --host localhost --port 8875",
+    "format": "prettier --write src scripts tests package.json tsconfig.json",
+    "format:check": "prettier --check src scripts tests package.json tsconfig.json"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.25.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.2.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
